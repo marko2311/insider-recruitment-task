@@ -15,12 +15,4 @@ class TeamRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Team::class);
     }
-
-    public function findAllOrderedByStrengthDesc(): array
-    {
-        return $this->createQueryBuilder('t')
-            ->orderBy('t.strength', 'DESC')
-            ->getQuery()
-            ->getResult();
-    }
 }

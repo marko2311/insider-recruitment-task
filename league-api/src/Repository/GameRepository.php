@@ -16,25 +16,6 @@ class GameRepository extends ServiceEntityRepository
         parent::__construct($registry, Game::class);
     }
 
-    public function findByWeek(int $week): array
-    {
-        return $this->createQueryBuilder('g')
-            ->where('g.week = :week')
-            ->setParameter('week', $week)
-            ->orderBy('g.id', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findByTeam(int $teamId): array
-    {
-        return $this->createQueryBuilder('g')
-            ->where('g.homeTeam = :id OR g.awayTeam = :id')
-            ->setParameter('id', $teamId)
-            ->getQuery()
-            ->getResult();
-    }
-
     public function findAllWeeks(): array
     {
         return $this->createQueryBuilder('g')

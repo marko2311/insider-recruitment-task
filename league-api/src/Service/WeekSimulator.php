@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\Game;
 use App\Repository\GameRepository;
 use App\Service\Generator\GameResultGeneratorInterface;
 use Doctrine\ORM\EntityManagerInterface;

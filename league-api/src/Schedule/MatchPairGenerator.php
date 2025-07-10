@@ -2,7 +2,6 @@
 
 namespace App\Schedule;
 
-use App\Entity\Team;
 use App\Dto\MatchPairDto;
 use Doctrine\Common\Collections\Collection;
 

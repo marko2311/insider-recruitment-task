@@ -1,7 +1,6 @@
 version: "3.8"
 
 services:
-  # 🔙 Symfony backend API
   league-api:
     build:
       context: ./league-api
@@ -15,7 +14,6 @@ services:
     environment:
       DATABASE_URL: mysql://symfony:symfony@db:3306/symfony?serverVersion=8.0
 
-  # 🛢️ MySQL baza danych
   db:
     image: mysql:8.0
     environment:
@@ -28,7 +26,6 @@ services:
     volumes:
       - db-data:/var/lib/mysql
 
-  # 🖥️ Frontend (Vue 3 + Vite)
   frontend:
     build:
       context: ./frontend
