@@ -22,13 +22,17 @@ class SeasonScheduler
         $pairs = $this->pairGenerator->generate($teams);
         shuffle($pairs);
 
+        $gamesPerWeek = array_chunk($pairs, 2);
         $week = 1;
-        foreach ($pairs as $pairDto) {
-            $game = new Game();
-            $game->setHomeTeam($pairDto->getHomeTeam());
-            $game->setAwayTeam($pairDto->getAwayTeam());
-            $game->setWeek($week++);
-            $this->em->persist($game);
+        foreach ($gamesPerWeek as $weeklyPairs) {
+            foreach ($weeklyPairs as $pairDto) {
+                $game = new Game();
+                $game->setHomeTeam($pairDto->getHomeTeam());
+                $game->setAwayTeam($pairDto->getAwayTeam());
+                $game->setWeek($week);
+                $this->em->persist($game);
+            }
+            $week++;
         }
 
         $this->em->flush();
