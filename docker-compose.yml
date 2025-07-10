@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  # 🔙 Symfony backend API
+  league-api:
+    build:
+      context: ./league-api
+    ports:
+      - "8080:8000"
+    volumes:
+      - ./league-api:/app:delegated
+      - symfony-cache:/app/var/cache
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: mysql://symfony:symfony@db:3306/symfony?serverVersion=8.0
+
+  # 🛢️ MySQL baza danych
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: symfony
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+
+  # 🖥️ Frontend (Vue 3 + Vite)
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - node_modules_frontend:/app/node_modules
+    depends_on:
+      - league-api
+
+volumes:
+  db-data:
+  node_modules_frontend:
+  symfony-cache:
