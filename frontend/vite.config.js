@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     host: true,
-    port: 5173, // tu wymuszasz konkretny port
-    strictPort: true, // ⛔ nie pozwól przeskoczyć na inny
+    port: 5173,
+    strictPort: true,
     proxy: {
       '/api': 'http://league-api:8000'
     }
