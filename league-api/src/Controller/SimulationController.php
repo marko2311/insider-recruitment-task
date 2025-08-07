@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
-use App\Service\SeasonSimulator;
-use App\Service\WeekSimulator;
+use App\Service\Simulation\SeasonSimulator;
+use App\Service\Simulation\WeekSimulator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class SimulationController extends AbstractController
@@ -21,7 +24,7 @@ class SimulationController extends AbstractController
         $this->weekSimulator->simulate($week);
 
         return $this->json([
-            'status' => 200
+            'status' => Response::HTTP_OK
         ]);
     }
 
@@ -31,7 +34,7 @@ class SimulationController extends AbstractController
         $this->seasonSimulator->simulate();
 
         return $this->json([
-            'status' => 200
+            'status' => Response::HTTP_OK
         ]);
     }
 }

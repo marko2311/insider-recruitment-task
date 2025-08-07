@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
-use App\Service\SeasonScheduler;
+use App\Service\Schedule\SeasonScheduler;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'league:generate-season',
+    description: 'Generates a match schedule for the new league season.'
 )]
 class GenerateSeasonCommand extends Command
 {
@@ -30,5 +33,10 @@ class GenerateSeasonCommand extends Command
         }
 
         return Command::SUCCESS;
+    }
+
+    protected function configure(): void
+    {
+        $this->setHelp('This command generates a full season schedule using the SeasonScheduler service.');
     }
 }
