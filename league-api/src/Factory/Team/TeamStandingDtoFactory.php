@@ -2,17 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\Factory;
+namespace App\Factory\Team;
 
-use App\Dto\TeamStandingDto;
+use App\Dto\Team\TeamStandingDto;
 use App\Entity\TeamStanding;
 
-class TeamStandingDtoFactory
+readonly class TeamStandingDtoFactory implements TeamStandingDtoFactoryInterface
 {
+    public function __construct(
+        private TeamDtoFactoryInterface $teamDtoFactory
+    ) {}
+
     public function createFromEntity(TeamStanding $standing): TeamStandingDto
     {
         return new TeamStandingDto(
-            team: $standing->getTeam(),
+            team: $this->teamDtoFactory->createFromEntity($standing->getTeam()),
             played: $standing->getPlayed(),
             wins: $standing->getWins(),
             draws: $standing->getDraws(),
@@ -22,5 +26,4 @@ class TeamStandingDtoFactory
             points: $standing->getPoints()
         );
     }
-
 }

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Factory;
+namespace App\Factory\Team;
 
-use App\Dto\TeamWinProbabilityDto;
+use App\Dto\Team\TeamWinProbabilityDto;
 
-class TeamWinProbabilityDtoFactory
+class TeamWinProbabilityDtoFactory implements TeamWinProbabilityDtoFactoryInterface
 {
     public function create(string $teamName, int $finalPoints, float $winProbability): TeamWinProbabilityDto
     {
