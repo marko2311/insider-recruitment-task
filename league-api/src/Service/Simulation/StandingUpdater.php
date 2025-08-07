@@ -2,31 +2,35 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Simulation;
 
 use App\Entity\Game;
+use App\Entity\Team;
 use App\Entity\TeamStanding;
 use App\Repository\TeamStandingRepository;
 use App\Simulation\MatchOutcomeStrategyInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use LogicException;
 
-class StandingUpdater
+readonly class StandingUpdater
 {
     public function __construct(
-        private readonly TeamStandingRepository $repo,
-        private readonly MatchOutcomeStrategyInterface $strategy,
-        private readonly EntityManagerInterface $em
+        private TeamStandingRepository        $repo,
+        private MatchOutcomeStrategyInterface $strategy,
+        private EntityManagerInterface        $em
     ) {}
 
     public function updateAfterGame(Game $game): void
     {
-        $home = $game->getHomeTeam();
-        $away = $game->getAwayTeam();
         $homeGoals = $game->getHomeGoals();
         $awayGoals = $game->getAwayGoals();
 
-        $homeStanding = $this->repo->findOneBy(['team' => $home]) ?? (new TeamStanding())->setTeam($home);
-        $awayStanding = $this->repo->findOneBy(['team' => $away]) ?? (new TeamStanding())->setTeam($away);
+        if ($homeGoals === null || $awayGoals === null) {
+            throw new LogicException('Cannot update standings – game not finished.');
+        }
+
+        $homeStanding = $this->getOrCreateStanding($game->getHomeTeam());
+        $awayStanding = $this->getOrCreateStanding($game->getAwayTeam());
 
         $homeStanding
             ->setPlayed($homeStanding->getPlayed() + 1)
@@ -42,5 +46,12 @@ class StandingUpdater
 
         $this->em->persist($homeStanding);
         $this->em->persist($awayStanding);
+        $this->em->flush();
+    }
+
+    private function getOrCreateStanding(Team $team): TeamStanding
+    {
+        return $this->repo->findOneBy(['team' => $team])
+            ?? (new TeamStanding())->setTeam($team);
     }
 }

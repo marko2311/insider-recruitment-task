@@ -2,27 +2,32 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Simulation;
 
+use App\Dto\Team\TeamWinProbabilityDto;
 use App\Entity\Game;
 use App\Entity\Team;
 use App\Entity\TeamStanding;
-use App\Factory\TeamWinProbabilityDtoFactory;
+use App\Factory\Team\TeamWinProbabilityDtoFactory;
 use App\Repository\GameRepository;
 use App\Repository\TeamStandingRepository;
 use App\Simulation\MatchOutcomeStrategyInterface;
 use App\Simulation\MatchSimulatorInterface;
 
-class PredictionService
+readonly class PredictionService
 {
     public function __construct(
-        private readonly GameRepository $gameRepository,
-        private readonly TeamStandingRepository $standingRepository,
-        private readonly MatchSimulatorInterface $simulator,
-        private readonly MatchOutcomeStrategyInterface $outcomeStrategy,
-        private readonly TeamWinProbabilityDtoFactory $dtoFactory,
+        private GameRepository                $gameRepository,
+        private TeamStandingRepository        $standingRepository,
+        private MatchSimulatorInterface       $simulator,
+        private MatchOutcomeStrategyInterface $outcomeStrategy,
+        private TeamWinProbabilityDtoFactory  $dtoFactory,
     ) {}
 
+    /**
+     * @param int $simulations
+     * @return array<int, TeamWinProbabilityDto>
+     */
     public function calculateChampionProbabilities(int $simulations = 1000): array
     {
         $teamNames = array_map(
@@ -63,10 +68,15 @@ class PredictionService
             $this->applyGameResult($game, $homeStanding, $awayStanding);
         }
 
-        $sorted = $this->sortStandings(array_values($standings));
+        [$winner] = $this->sortStandings(array_values($standings)) + [null];
 
-        return $sorted[0]->getTeam();
+        if (!$winner instanceof TeamStanding) {
+            throw new \RuntimeException('No standings available to determine winner.');
+        }
+
+        return $winner->getTeam();
     }
+
 
     protected function applyGameResult(Game $game, TeamStanding $home, TeamStanding $away): void
     {
@@ -83,6 +93,10 @@ class PredictionService
         $this->outcomeStrategy->apply($game, $home, $away);
     }
 
+    /**
+     * @param TeamStanding[] $originals
+     * @return TeamStanding[] (assoc by team ID)
+     */
     private function cloneStandings(array $originals): array
     {
         $clones = [];
@@ -102,6 +116,10 @@ class PredictionService
         return $clones;
     }
 
+    /**
+     * @param Game[] $games
+     * @return Game[]
+     */
     private function cloneGames(array $games): array
     {
         return array_map(function (Game $g) {
@@ -113,6 +131,10 @@ class PredictionService
         }, $games);
     }
 
+    /**
+     * @param TeamStanding[] $standings
+     * @return TeamStanding[]
+     */
     private function sortStandings(array $standings): array
     {
         usort($standings, fn(TeamStanding $a, TeamStanding $b) => [

@@ -1,35 +1,43 @@
 <?php
 
-namespace App\Service;
+declare(strict_types=1);
 
+namespace App\Service\Schedule;
+
+use App\Dto\Match\MatchPairDto;
 use App\Entity\Game;
+use App\Entity\Team;
 use App\Repository\TeamRepository;
-use App\Schedule\MatchPairGeneratorInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 
-class SeasonScheduler
+readonly class SeasonScheduler
 {
     public function __construct(
-        private readonly TeamRepository $teamRepository,
-        private readonly MatchPairGeneratorInterface $pairGenerator,
-        private readonly EntityManagerInterface $em
+        private TeamRepository              $teamRepository,
+        private MatchPairGeneratorInterface $pairGenerator,
+        private EntityManagerInterface      $em
     ) {}
 
     public function generateSchedule(): void
     {
-        $teams = new ArrayCollection($this->teamRepository->findAll());
-        $pairs = $this->pairGenerator->generate($teams);
+        /** @var Team[] $teams */
+        $teams = $this->teamRepository->findAll();
+
+        $pairs = $this->pairGenerator->generate(new ArrayCollection($teams));
+
         shuffle($pairs);
 
-        $gamesPerWeek = array_chunk($pairs, 2);
         $week = 1;
-        foreach ($gamesPerWeek as $weeklyPairs) {
+
+        /** @var MatchPairDto[] $weeklyPairs */
+        foreach ($pairs as $weeklyPairs) {
             foreach ($weeklyPairs as $pairDto) {
                 $game = new Game();
                 $game->setHomeTeam($pairDto->getHomeTeam());
                 $game->setAwayTeam($pairDto->getAwayTeam());
                 $game->setWeek($week);
+
                 $this->em->persist($game);
             }
             $week++;

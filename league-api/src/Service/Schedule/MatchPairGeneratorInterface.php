@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Schedule;
+namespace App\Service\Schedule;
 
-use App\Dto\MatchPairDto;
+use App\Dto\Match\MatchPairDto;
 use Doctrine\Common\Collections\Collection;
 
 /**

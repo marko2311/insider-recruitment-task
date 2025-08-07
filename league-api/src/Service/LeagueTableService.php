@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Dto\TeamStandingDto;
-use App\Factory\TeamStandingDtoFactory;
+use App\Dto\Team\TeamStandingDto;
+use App\Factory\Team\TeamStandingDtoFactoryInterface;
 use App\Repository\TeamStandingRepository;
 
-class LeagueTableService
+readonly class LeagueTableService
 {
     public function __construct(
-        private readonly TeamStandingRepository $repository,
-        private readonly TeamStandingDtoFactory $factory
+        private TeamStandingRepository $repository,
+        private TeamStandingDtoFactoryInterface $factory
     ) {}
 
     /**
