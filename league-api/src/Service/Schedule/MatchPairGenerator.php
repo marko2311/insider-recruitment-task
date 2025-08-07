@@ -83,10 +83,12 @@ readonly class MatchPairGenerator implements MatchPairGeneratorInterface
 
     private function rotateTeams(array $teams): array
     {
-        return array_merge(
-            [$teams[0]],
-            [end($teams)],
-            array_slice($teams, 1, -1)
-        );
+        $fixed = array_shift($teams);
+        $last = array_pop($teams);
+        array_unshift($teams, $last);
+        array_unshift($teams, $fixed);
+
+        return $teams;
     }
+
 }
