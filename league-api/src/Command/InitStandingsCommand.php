@@ -12,18 +12,31 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'app:init-standings',
+    description: 'Initializes team standings at the beginning of the season.'
 )]
 class InitStandingsCommand extends Command
 {
-    public function __construct(private readonly TeamStandingInitializer $initializer)
-    {
+    public function __construct(
+        private readonly TeamStandingInitializer $initializer
+    ) {
         parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this->setHelp('This command initializes all team standings using default values. Run it before the season starts.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->initializer->initialize();
-        $output->writeln('<info>Standings initialized.</info>');
+        try {
+            $this->initializer->initialize();
+            $output->writeln('<info>Standings initialized.</info>');
+        } catch (\Throwable $e) {
+            $output->writeln('<error>Error: ' . $e->getMessage() . '</error>');
+            return Command::FAILURE;
+        }
+
         return Command::SUCCESS;
     }
 }
