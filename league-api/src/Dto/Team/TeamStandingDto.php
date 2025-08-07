@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Dto;
+namespace App\Dto\Team;
 
-use App\Entity\Team;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 readonly class TeamStandingDto
 {
     public function __construct(
-        private Team $team,
+        private TeamDto $team,
         private int  $played,
         private int  $wins,
         private int  $draws,
@@ -26,7 +25,7 @@ readonly class TeamStandingDto
         return $this->goalsFor - $this->goalsAgainst;
     }
 
-    public function getTeam(): Team
+    public function getTeam(): TeamDto
     {
         return $this->team;
     }

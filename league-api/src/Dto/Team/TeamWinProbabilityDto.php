@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Dto;
+namespace App\Dto\Team;
 
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -10,13 +10,13 @@ readonly class TeamWinProbabilityDto
 {
     public function __construct(
         #[Groups(['prediction'])]
-        public string $teamName,
+        private string $teamName,
 
         #[Groups(['prediction'])]
-        public int $finalPoints,
+        private int $finalPoints,
 
         #[Groups(['prediction'])]
-        public float $winProbability,
+        private float $winProbability,
     ) {}
 
     public function getTeamName(): string

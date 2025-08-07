@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace App\Dto;
+namespace App\Dto\Game;
 
-use App\Entity\Team;
+use App\Dto\Team\TeamDto;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 readonly class GameResultDto
 {
     public function __construct(
-        private Team $homeTeam,
-        private Team $awayTeam,
+        private TeamDto $homeTeam,
+        private TeamDto $awayTeam,
         private ?int $homeGoals,
         private ?int $awayGoals,
         private int  $week
     ) {}
 
-    public function getHomeTeam(): Team
+    public function getHomeTeam(): TeamDto
     {
         return $this->homeTeam;
     }
@@ -28,7 +28,7 @@ readonly class GameResultDto
         return $this->homeTeam->getName();
     }
 
-    public function getAwayTeam(): Team
+    public function getAwayTeam(): TeamDto
     {
         return $this->awayTeam;
     }
