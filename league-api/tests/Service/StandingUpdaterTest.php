@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Service;
 
 use App\Entity\Game;
@@ -9,10 +11,14 @@ use App\Repository\TeamStandingRepository;
 use App\Service\StandingUpdater;
 use App\Simulation\MatchOutcomeStrategyInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
 class StandingUpdaterTest extends TestCase
 {
+    /**
+     * @throws Exception
+     */
     public function testUpdateAfterGameWithExistingStandings(): void
     {
         $homeTeam = (new Team())->setName('Home FC');
@@ -62,6 +68,9 @@ class StandingUpdaterTest extends TestCase
         $this->assertEquals(8, $awayStanding->getGoalsAgainst());
     }
 
+    /**
+     * @throws Exception
+     */
     public function testUpdateAfterGameWithMissingStandings(): void
     {
         $homeTeam = (new Team())->setName('New Home');
