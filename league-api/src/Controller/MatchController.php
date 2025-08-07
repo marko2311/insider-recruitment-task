@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Game;
-use App\Factory\GameResultDtoFactory;
+use App\Factory\Game\GameResultDtoFactoryInterface;
+use App\Factory\Game\UpdateGameResultDtoFactoryInterface;
 use App\Repository\GameRepository;
+use App\Validator\Game\UpdateGameResultValidatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,7 +20,9 @@ class MatchController extends AbstractController
 {
     public function __construct(
         private readonly GameRepository $gameRepository,
-        private readonly GameResultDtoFactory $gameResultDtoFactory,
+        private readonly GameResultDtoFactoryInterface $gameResultDtoFactory,
+        private readonly UpdateGameResultDtoFactoryInterface $updateGameResultDtoFactory,
+        private readonly UpdateGameResultValidatorInterface $updateGameResultValidator,
         private readonly EntityManagerInterface $em
     ) {}
 
@@ -35,7 +39,7 @@ class MatchController extends AbstractController
         return $this->json($results, Response::HTTP_OK, [], ['groups' => ['game']]);
     }
 
-    #[Route('/api/matches', name: 'api_matches_season', methods: ['GET'])]
+    #[Route('/api/matches', name: 'api_matches', methods: ['GET'])]
     public function getAllMatches(): JsonResponse
     {
         $games = $this->gameRepository->findAll();
@@ -49,7 +53,7 @@ class MatchController extends AbstractController
     }
 
     #[Route('/api/matches/{id}', name: 'api_match_update', methods: ['PATCH'])]
-    public function update(int $id, Request $request): JsonResponse
+    public function updateMatch(int $id, Request $request): JsonResponse
     {
         $game = $this->gameRepository->find($id);
 
@@ -70,8 +74,8 @@ class MatchController extends AbstractController
 
         $this->updateGameResultValidator->validate($dto);
 
-        $game->setHomeGoals($dto->homeGoals);
-        $game->setAwayGoals($dto->awayGoals);
+        $game->setHomeGoals($dto->getHomeGoals());
+        $game->setAwayGoals($dto->getAwayGoals());
 
         $this->em->flush();
 
