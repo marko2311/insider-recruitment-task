@@ -8,9 +8,6 @@ use App\Entity\TeamStanding;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<TeamStanding>
- */
 class TeamStandingRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
