@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MatchController extends AbstractController
@@ -22,7 +23,7 @@ class MatchController extends AbstractController
     ) {}
 
     #[Route('/api/matches/week/{week}', name: 'api_matches_week', methods: ['GET'])]
-    public function getWeek(int $week): JsonResponse
+    public function getMatchesByWeek(int $week): JsonResponse
     {
         $games = $this->gameRepository->findBy(['week' => $week]);
 
@@ -31,11 +32,11 @@ class MatchController extends AbstractController
             $games
         );
 
-        return $this->json($results, 200, [], ['groups' => ['game']]);
+        return $this->json($results, Response::HTTP_OK, [], ['groups' => ['game']]);
     }
 
     #[Route('/api/matches', name: 'api_matches_season', methods: ['GET'])]
-    public function getSeason(): JsonResponse
+    public function getAllMatches(): JsonResponse
     {
         $games = $this->gameRepository->findAll();
 
@@ -44,32 +45,42 @@ class MatchController extends AbstractController
             $games
         );
 
-        return $this->json($results, 200, [], ['groups' => ['game']]);
+        return $this->json($results, Response::HTTP_OK, [], ['groups' => ['game']]);
     }
 
-    #[Route('/api/match/{id}', name: 'api_match_update', methods: ['PATCH'])]
+    #[Route('/api/matches/{id}', name: 'api_match_update', methods: ['PATCH'])]
     public function update(int $id, Request $request): JsonResponse
     {
         $game = $this->gameRepository->find($id);
 
         if (!$game) {
-            return $this->json(['error' => 'Game not found'], 404);
+            return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
 
         $data = json_decode($request->getContent(), true);
 
-        $homeGoals = $data['homeGoals'] ?? null;
-        $awayGoals = $data['awayGoals'] ?? null;
-
-        if (!is_int($homeGoals) || !is_int($awayGoals)) {
-            return $this->json(['error' => 'Invalid goals format'], 400);
+        if (!is_array($data)) {
+            return $this->json(['error' => 'Invalid JSON'], Response::HTTP_BAD_REQUEST);
         }
 
-        $game->setHomeGoals($homeGoals);
-        $game->setAwayGoals($awayGoals);
+        $dto = $this->updateGameResultDtoFactory->create(
+            $data['homeGoals'] ?? null,
+            $data['awayGoals'] ?? null
+        );
+
+        $this->updateGameResultValidator->validate($dto);
+
+        $game->setHomeGoals($dto->homeGoals);
+        $game->setAwayGoals($dto->awayGoals);
 
         $this->em->flush();
 
-        return $this->json(['status' => 'Match updated']);
+        return $this->json(
+            $this->gameResultDtoFactory->createFromEntity($game),
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['game']]
+        );
     }
+
 }
