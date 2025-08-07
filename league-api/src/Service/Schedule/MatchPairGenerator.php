@@ -22,6 +22,8 @@ readonly class MatchPairGenerator implements MatchPairGeneratorInterface
     {
         $list = array_values($teams->toArray());
 
+        shuffle($list);
+
         if (count($list) % 2 !== 0) {
             $list[] = null;
         }

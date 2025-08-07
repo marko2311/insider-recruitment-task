@@ -26,8 +26,6 @@ readonly class SeasonScheduler
 
         $pairs = $this->pairGenerator->generate(new ArrayCollection($teams));
 
-        shuffle($pairs);
-
         $week = 1;
 
         /** @var MatchPairDto[] $weeklyPairs */
